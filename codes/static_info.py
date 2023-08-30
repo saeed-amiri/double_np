@@ -1,6 +1,7 @@
 """All the constant values use in the silanization"""
 
 import typing
+import sys
 import os
 
 SOURCE_DIR: str  # SOURCE OF THE DATA FILES
@@ -123,6 +124,21 @@ class Hydration:
     # Molal should be in `MILIMOLAL`:  millimoles per kg !!!
     N_NACL: dict[str, typing.Any]  # Type of concenteration and amount
     N_NACL = {'sty': 'mmolal', 'sum': 0}
+
+
+class NanoParticles:
+    """information about the nanoparticles
+    For each nanoparticle the radius and its source of the file.
+    SEPERATION is the info for seperation distance between nanoparticles
+    and where they should set; if 'center' the midpoint between the
+    particles will be set at 0 0 0.
+    """
+    NP_LIST: list[dict[str, typing.Any]] = [
+        NP1 := {'radius': 25, 'source': sys.argv[1]},
+        NP2 := {'radius': 25, 'source': sys.argv[2]},
+        SEPERATION := {'distance': 10, 'origin': 'center'}
+
+    ]
 
 
 class PosRes:
