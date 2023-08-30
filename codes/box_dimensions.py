@@ -54,9 +54,6 @@ class NumMols:
                     log: logger.logging.Logger
                     ) -> None:
         """clculate the numbers of each moles if asked"""
-        print(f'{bcolors.OKCYAN}{self.__class__.__name__}:'
-              f'({self.__module__}):'
-              f'{bcolors.ENDC}')
         box_volume: float  # Volume of the final system's box
         box_volume = self.__box_volume(radius)
         # !!!num_oda must be set before num_ioins!!!
