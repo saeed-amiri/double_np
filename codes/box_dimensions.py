@@ -9,21 +9,28 @@ is no oil phase in the system.
 import sys
 import my_tools
 import numpy as np
+
+import logger
 import static_info as stinfo
 from colors_text import TextColor as bcolors
 
 
 class NumMols:
-    """calculate the number of molecules for each of the system:
+    """
+    Calculate the number of molecules for each of the system:
     Numbers of water molecules (In data files named as: SOL)
     Number of decane molecules (In data files named as: oil)
     Numbers of ODAP molecules (In data files named as: ODAP)
     Numbers od ODA molecules (In data files named as: ODAN)
     Numbers of ION atoms (In data files named as: NA or CL)
     """
+
+    info_msg: str = 'Message from NumMol:\n'  # Message to pass for logging
+
     def __init__(self,
                  radius: float,  # Radius of the silanized nanoparticle (NP)
-                 net_charge: float  # Charge of the silanized NP with sign!
+                 net_charge: float,  # Charge of the silanized NP with sign!
+                 log: logger.logging.Logger
                  ) -> None:
         self.moles_nums: dict[str, int]  # All the needed moles and atoms
         self.moles_nums = {'sol': 0,  # Number of water molecues in the system
@@ -45,6 +52,7 @@ class NumMols:
                                   'z_lim': 0.0}}
         self.inscibed_edge: float  # Edge of the cube that inscribed the sphere
         self.get_numbers(radius, net_charge)
+        self.__write_msg(log)
 
     def get_numbers(self,
                     radius: float,  # Radius of the silanized nanoparticle
@@ -62,11 +70,11 @@ class NumMols:
         if stinfo.Hydration.CONATCT_ANGLE < 0:
             self.__pure_water_system(box_volume)
         else:
-            print(f'{bcolors.OKCYAN}'
+            self.info_msg += (
                   f'\tThe contact angle is: `{stinfo.Hydration.CONATCT_ANGLE}`'
                   ' [degree] which is: '
-                  f'"{np.radians(stinfo.Hydration.CONATCT_ANGLE):.4f}" '
-                  f'[rad] {bcolors.ENDC}')
+                  f'"{np.radians(stinfo.Hydration.CONATCT_ANGLE):.4f}" [rad]\n'
+                  )
             self.__oil_water_system(radius)
             self.moles_nums['odn'] = self.__get_odn_num()
         # Obviously the number of water should be defined before hand
@@ -162,15 +170,12 @@ class NumMols:
         else:
             num_ions: int = int(np.sign(net_charge)*charge_floor)
         if charge_floor != np.abs(net_charge):
-            print(f'{bcolors.CAUTION}{self.__class__.__name__}" '
-                  f'({self.__module__}):\n'
-                  f'\tNet charge is not a complete number! "{net_charge}"\n'
-                  f'{bcolors.ENDC}')
+            self.info_msg += (
+                f'\tNet charge is not a complete number! "{net_charge}"\n')
         if num_ions > 0:
-            print(f'{bcolors.CAUTION}'
+            self.info_msg += (
                   f'\tTotal charge of the system is `{charge_floor}`\n'
-                  f'\tThe number of ions is set to "{num_ions}"'
-                  f'{bcolors.ENDC}')
+                  f'\tThe number of ions is set to "{num_ions}"\n')
         return num_ions
 
     def __solution_mol_num(self,
@@ -186,8 +191,8 @@ class NumMols:
         sol_moles: float
         sol_moles = int(m_water * stinfo.Hydration.AVOGADRO /
                         molar_mass) + 1
-        print(f'{bcolors.OKCYAN}\tThe number {sys_name} molecules is '
-              f'"{sol_moles}"{bcolors.ENDC}')
+        self.info_msg += (
+            f'\tThe number {sys_name} molecules is "{sol_moles}"\n')
         return sol_moles
 
     def __get_odap_num(self) -> int:
@@ -203,10 +208,9 @@ class NumMols:
         else:
             state = 'unprotonated'
             charge = 0
-        print(f'{bcolors.OKCYAN}'
+        self.info_msg += (
               f'\tNumber of {state} ODA in water is set to '
-              f'"{oda_moles}" with total charge of `{charge}`'
-              f'{bcolors.ENDC}')
+              f'"{oda_moles}" with total charge of `{charge}`\n')
         return oda_moles
 
     def __get_odn_num(self) -> int:
@@ -214,9 +218,9 @@ class NumMols:
         odn_moles: int  # Number of oda molecules in the system
         # I will add the calculation later, but for now:
         odn_moles = stinfo.Hydration.N_ODAN
-        print(f'{bcolors.OKCYAN}\tNumber of ODAN (unprotonated ODA) is '
-              f'set to "{odn_moles}" with total charge of `{odn_moles}`'
-              f'{bcolors.ENDC}')
+        self.info_msg += (
+            '\tNumber of ODAN (unprotonated ODA) is '
+            f'set to "{odn_moles}" with total charge of `{odn_moles}`')
         return odn_moles
 
     def __box_volume(self,
@@ -249,10 +253,11 @@ class NumMols:
         box_volume: float = x_lim*y_lim*z_lim
         box_edges = {'x_lim': x_lim, 'y_lim': y_lim, 'z_lim': z_lim}
         if box_volume <= 0:
+            err_msg: str = (
+                f'\tZero volume, there in problem in setting box '
+                f'limitaion, box_volume is "{box_volume:.3f}"')
             sys.exit(f'{bcolors.FAIL}{self.__class__.__name__}:\n'
-                     f'\tZero volume, there in problem in setting box '
-                     f'limitaion, box_volume is "{box_volume:.3f}"'
-                     f'{bcolors.ENDC}')
+                     f'{err_msg}{bcolors.ENDC}')
         self.inscibed_edge = inscibed_edge
         return box_edges, box_volume
 
@@ -262,14 +267,20 @@ class NumMols:
         """calculate the volume of the sphere for the NP"""
         sphere_volume: float = 4*np.pi*(radius**3)/3
         if sphere_volume <= 0:
+            err_msg: str = (
+                f'\tZero volume, there in problem in setting sphere '
+                f'valume, it is "{sphere_volume:.3f}"')
             sys.exit(f'{bcolors.FAIL}{self.__class__.__name__}:\n'
-                     f'\tZero volume, there in problem in setting sphere '
-                     f'valume, it is "{sphere_volume:.3f}"'
-                     f'{bcolors.ENDC}')
+                     f'{err_msg}{bcolors.ENDC}')
         return sphere_volume
 
-    def print_info(self) -> None:
-        """pylint"""
+    def __write_msg(self,
+                    log: logger.logging.Logger
+                    ) -> None:
+        """write and log messages"""
+        print(f'{bcolors.OKCYAN}{NumMols.__module__}:\n'
+              f'\t{self.info_msg}{bcolors.ENDC}')
+        log.info(self.info_msg)
 
 
 class SaltSum:
@@ -327,12 +338,13 @@ class BoxEdges:
     """make the calculation for system box based on the contact angle"""
     def __init__(self,
                  radius: float,  # Radius of NP after silanization
-                 net_charge: float  # Total charge of the NP with sign!
+                 net_charge: float,  # Total charge of the NP with sign!
+                 log: logger.logging.Logger
                  ) -> None:
         self.radius: float = radius  # To have it as attribute for later use
         self.water_axis: dict[str, float] = {}  # Limitation of the water part
         self.oil_axis: dict[str, float] = {}  # Limitation of the oil part
-        num_mols = NumMols(radius, net_charge)
+        num_mols = NumMols(radius, net_charge, log)
         self.box_edges = num_mols.box_edges  # See NumMols class __init__
         self.num_mols = num_mols.moles_nums  # See NumMols class __init__
         self.get_sections_edge()
@@ -390,4 +402,5 @@ class BoxEdges:
 
 
 if __name__ == '__main__':
-    axis_limits = BoxEdges(radius=25, net_charge=10)
+    axis_limits = BoxEdges(
+        radius=25, net_charge=10, log=logger.setup_logger('box_dims.log'))
