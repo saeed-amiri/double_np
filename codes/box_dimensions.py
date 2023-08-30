@@ -45,12 +45,13 @@ class NumMols:
             'sol': {'x_lim': 0.0, 'y_lim': 0.0, 'z_lim': 0.0},
             'oil': {'x_lim': 0.0, 'y_lim': 0.0, 'z_lim': 0.0}
             }
-        self.get_numbers(radius, net_charge)
+        self.get_numbers(radius, net_charge, log)
         self.__write_msg(log)
 
     def get_numbers(self,
                     radius: float,  # Radius of the silanized nanoparticle
-                    net_charge: float  # Charge of the silanized NP with sign!
+                    net_charge: float,  # Charge of the silanized NP with sign!
+                    log: logger
                     ) -> None:
         """clculate the numbers of each moles if asked"""
         print(f'{bcolors.OKCYAN}{self.__class__.__name__}:'
@@ -72,12 +73,14 @@ class NumMols:
             self.__oil_water_system(radius)
             self.moles_nums['odn'] = self.__get_odn_num()
         # Obviously the number of water should be defined before hand
-        self.moles_nums['sal'] = int(self.__get_nacl_num())
+        self.moles_nums['sal'] = int(self.__get_nacl_num(log))
 
-    def __get_nacl_num(self) -> float:
+    def __get_nacl_num(self,
+                       log: logger.logging.Logger
+                       ) -> float:
         """return the number of NaCl molecules based on the concente-
         ration."""
-        nacl = SaltSum(self.moles_nums['sol'])
+        nacl = SaltSum(self.moles_nums['sol'], log)
         return nacl.n_nacl
 
     def __oil_water_system(self,
@@ -280,12 +283,16 @@ class NumMols:
 class SaltSum:
     """get the number of NaCl molecules based on the concentration
     that asked in the input."""
+
+    info_msg: str = '\tMessage from SaltSum:\n'
     def __init__(self,
-                 n_water: int  # Number of the water molecules
+                 n_water: int,  # Number of the water molecules
+                 log: logger.logging.Logger
                  ) -> None:
         self.n_nacl: int  # Number of the NaCl molecules
         self.n_nacl = self.get_salt(n_water)
-        self.print_info()
+        self.set_info()
+        self.write_msg(log)
 
     def get_salt(self,
                  n_water: int  # Number of the water molecules
@@ -318,14 +325,21 @@ class SaltSum:
         n_nacl = n_water*stinfo.Hydration.WATER_MOLAR_MASS*amount*1e-6
         return np.ceil(n_nacl).astype(int)
 
-    def print_info(self) -> None:
+    def set_info(self) -> None:
         """print info"""
-        print(f'{bcolors.OKCYAN}{self.__class__.__name__}: '
-              f'({self.__module__})\n'
+        self.info_msg += (
               '\tThe number of NaCl molecules for concentration of '
               f'`{stinfo.Hydration.N_NACL["sum"]} '
               f'{stinfo.Hydration.N_NACL["sty"]}` is set to '
-              f'"{self.n_nacl}"\n{bcolors.ENDC}')
+              f'"{self.n_nacl}"\n')
+
+    def write_msg(self,
+                  log: logger.logging.Logger
+                  ) -> None:
+        """write and log messages"""
+        print(f'{bcolors.OKCYAN}{SaltSum.__module__}:\n'
+              f'\t{self.info_msg}{bcolors.ENDC}')
+        log.info(self.info_msg)
 
 
 class BoxEdges:
