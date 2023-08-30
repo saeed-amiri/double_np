@@ -1,2 +1,2 @@
 # double_np
-making system for double nanoparticles
+making systems for double nanoparticles
