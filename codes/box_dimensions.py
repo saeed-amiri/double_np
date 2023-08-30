@@ -51,7 +51,7 @@ class NumMols:
     def get_numbers(self,
                     radius: float,  # Radius of the silanized nanoparticle
                     net_charge: float,  # Charge of the silanized NP with sign!
-                    log: logger
+                    log: logger.logging.Logger
                     ) -> None:
         """clculate the numbers of each moles if asked"""
         print(f'{bcolors.OKCYAN}{self.__class__.__name__}:'
@@ -70,7 +70,7 @@ class NumMols:
                   ' [degree] which is: '
                   f'"{np.radians(stinfo.Hydration.CONATCT_ANGLE):.4f}" [rad]\n'
                   )
-            self.__oil_water_system(radius)
+            self.oil_water_system(radius)
             self.moles_nums['odn'] = self.__get_odn_num()
         # Obviously the number of water should be defined before hand
         self.moles_nums['sal'] = int(self.__get_nacl_num(log))
@@ -83,9 +83,9 @@ class NumMols:
         nacl = SaltSum(self.moles_nums['sol'], log)
         return nacl.n_nacl
 
-    def __oil_water_system(self,
-                           radius: float  # Radius of the silanized NP
-                           ) -> None:
+    def oil_water_system(self,
+                         radius: float  # Radius of the silanized NP
+                         ) -> None:
         """set the data for the system with oil and water"""
         oil_depth: float  # Depth of the oil phase on the NP
         oil_depth = my_tools.oil_depth(radius)
@@ -165,7 +165,7 @@ class NumMols:
         if stinfo.Hydration.ODAP_PROTONATION:
             num_ions: int = int(np.sign(net_charge)*charge_floor) + num_odap
         else:
-            num_ions: int = int(np.sign(net_charge)*charge_floor)
+            num_ions = int(np.sign(net_charge)*charge_floor)
         if charge_floor != np.abs(net_charge):
             self.info_msg += (
                 f'\tNet charge is not a complete number! "{net_charge}"\n')
@@ -285,6 +285,7 @@ class SaltSum:
     that asked in the input."""
 
     info_msg: str = '\tMessage from SaltSum:\n'
+
     def __init__(self,
                  n_water: int,  # Number of the water molecules
                  log: logger.logging.Logger
@@ -356,13 +357,12 @@ class BoxEdges:
         self.box_edges = num_mols.box_edges  # See NumMols class __init__
         self.num_mols = num_mols.moles_nums  # See NumMols class __init__
         self.get_sections_edge()
-        self.print_info()
 
     def get_sections_edge(self) -> None:
         """set the limits of axis for each sections of the system box"""
         x_lo: float  # Low limit of the system box in x direction
         y_lo: float  # Low limit of the system box in y direction
-        x_lo, y_lo = self.__get_xy_lims()
+        x_lo, y_lo = self.get_xy_lims()
         self.__set_xy_lims(x_lo, y_lo)
         self.__set_z_lims()
 
@@ -397,16 +397,13 @@ class BoxEdges:
             self.oil_axis['y_lo'] = y_lo
             self.oil_axis['y_hi'] = -y_lo
 
-    def __get_xy_lims(self) -> tuple[float, float]:
+    def get_xy_lims(self) -> tuple[float, float]:
         """find the x and y lowe limitations of the box"""
         x_lo: float  # min of the axis in the x_axis
         x_lo = -self.box_edges['box'].copy()['x_lim'] / 2
         y_lo: float  # min of the axis in the x_axis
         y_lo = -self.box_edges['box'].copy()['y_lim'] / 2
         return x_lo, y_lo
-
-    def print_info(self) -> None:
-        """pylit"""
 
 
 if __name__ == '__main__':
