@@ -7,3 +7,9 @@ residue. The center point between the two nanoparticles will be set at
 coordinates (0 0 0).
 """
 
+import logger
+import box_dimensions
+
+
+if __name__ == '__main__':
+    box_dimensions.BoxEdges(25, 10, log=logger.setup_logger('box_dims.log'))
