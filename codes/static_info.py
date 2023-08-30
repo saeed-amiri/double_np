@@ -6,6 +6,7 @@ import os
 SOURCE_DIR: str  # SOURCE OF THE DATA FILES
 SOURCE_DIR = '/scratch/saeed/MyScripts/np_silica/data'
 
+
 class Hydration:
     """set all the info for water box
     Limitation for the box are added to the maximum radius of the NP"""
@@ -73,13 +74,13 @@ class Hydration:
                               'NA': NA_Q,
                               'CL': CL_Q},
                     'charmm': {'OH2': 0.0,
-                              'H1': 0.52,
-                              'H2': 0.52,
-                              'POT': NA_Q,
-                              'CLA': CL_Q}
+                               'H1': 0.52,
+                               'H2': 0.52,
+                               'POT': NA_Q,
+                               'CLA': CL_Q}
                     }
     # PACKMOL files
-    
+
     WATER_PDB: str = os.path.join(SOURCE_DIR, 'water_charmm.pdb')
     ODAP_PDB: str = os.path.join(SOURCE_DIR, 'ODAp_charmm.pdb')
     ODAN_PDB: str = os.path.join(SOURCE_DIR, 'ODAn_charmm.pdb')
@@ -109,12 +110,12 @@ class Hydration:
     # should only be used if you want the ODA in the oil phase.
     ODAP_PROTONATION: bool = True
     N_ODAP: int = 50  # Protonated ODA will add to water section
-    N_ODAN: int = 0 # Unprotonated ODA will add to if oil section
+    N_ODAN: int = 0  # Unprotonated ODA will add to if oil section
     # If the protonated ODA should be at the interface at the beginning,
     # set the following to INTERFACE or if they shoud be in the edge of
     # the oil phase set it to `OILDOWN` and in water edge put it to
     # `WATERTOP`:
-    ODAP_INTERFACE: bool = 'WATERTOP'
+    ODAP_INTERFACE: str = 'WATERTOP'
     # Salt (NaCl) parameters
     # Need a tuple type of concentration or molality
     # For now it only support molality
@@ -144,4 +145,4 @@ class GroInp:
     IONITP: str = '../../force_field/CLA.itp'
     TOPFILE: str = 'topol.top'
     NPPOSRES: bool = True  # True if want to set the restraints on NP
-    WATERPOSRES: bool = False  #True of want to set restraints on NP
+    WATERPOSRES: bool = False  # True of want to set restraints on NP
