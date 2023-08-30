@@ -18,14 +18,15 @@ from colors_text import TextColor as bcolors
 class NumMols:
     """
     Calculate the number of molecules for each of the system:
-    Numbers of water molecules (In data files named as: SOL)
-    Number of decane molecules (In data files named as: oil)
-    Numbers of ODAP molecules (In data files named as: ODAP)
-    Numbers od ODA molecules (In data files named as: ODAN)
-    Numbers of ION atoms (In data files named as: NA or CL)
+    - Water molecules (sol)
+    - Decane molecules (oil)
+    - ODAP molecules (odap)
+    - ODA molecules (odan)
+    - ION atoms (NA or CL)
     """
 
     info_msg: str = 'Message from NumMol:\n'  # Message to pass for logging
+    inscibed_edge: float  # Edge of the cube that inscribed the sphere
 
     def __init__(self,
                  radius: float,  # Radius of the silanized nanoparticle (NP)
@@ -33,24 +34,17 @@ class NumMols:
                  log: logger.logging.Logger
                  ) -> None:
         self.moles_nums: dict[str, int]  # All the needed moles and atoms
-        self.moles_nums = {'sol': 0,  # Number of water molecues in the system
-                           'oil': 0,  # Number of decane molecues in the system
-                           'oda': 0,  # Number of ODAp molecues in the system
-                           'odn': 0,  # Number of ODA molecues in the system
+        self.moles_nums = {'sol': 0, 'oil': 0,
+                           'oda': 0, 'odn': 0,
                            'ion': 0,  # Number of ION atoms in the system
                            'sal': 0  # Number of NaCl molecule in the system
                            }
         self.box_edges: dict[str, dict[str, float]]  # Edges of system's box
-        self.box_edges = {'box': {'x_lim': 0.0,  # System's box
-                                  'y_lim': 0.0,
-                                  'z_lim': 0.0},
-                          'sol': {'x_lim': 0.0,  # Water's section
-                                  'y_lim': 0.0,
-                                  'z_lim': 0.0},
-                          'oil': {'x_lim': 0.0,  # Decane's section
-                                  'y_lim': 0.0,
-                                  'z_lim': 0.0}}
-        self.inscibed_edge: float  # Edge of the cube that inscribed the sphere
+        self.box_edges = {
+            'box': {'x_lim': 0.0, 'y_lim': 0.0, 'z_lim': 0.0},
+            'sol': {'x_lim': 0.0, 'y_lim': 0.0, 'z_lim': 0.0},
+            'oil': {'x_lim': 0.0, 'y_lim': 0.0, 'z_lim': 0.0}
+            }
         self.get_numbers(radius, net_charge)
         self.__write_msg(log)
 
