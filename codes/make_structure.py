@@ -12,4 +12,5 @@ import box_dimensions
 
 
 if __name__ == '__main__':
-    box_dimensions.BoxEdges(25, 10, log=logger.setup_logger('box_dims.log'))
+    axis_limits = box_dimensions.BoxEdges(
+        25, 10, log=logger.setup_logger('box_dims.log'))
