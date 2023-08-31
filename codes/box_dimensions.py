@@ -11,6 +11,7 @@ import my_tools
 import numpy as np
 
 import logger
+import pdb_to_df
 import static_info as stinfo
 from colors_text import TextColor as bcolors
 
@@ -33,6 +34,7 @@ class NumMols:
                  net_charge: float,  # Charge of the silanized NP with sign!
                  log: logger.logging.Logger
                  ) -> None:
+        self.radii: list[float] = self.get_radius()
         self.moles_nums: dict[str, int]  # All the needed moles and atoms
         self.moles_nums = {'sol': 0, 'oil': 0,
                            'oda': 0, 'odn': 0,
@@ -47,6 +49,17 @@ class NumMols:
             }
         self.get_numbers(radius, net_charge, log)
         self.__write_msg(log)
+
+    def get_radius(self) -> list[float]:
+        """read pdb files and get radii of the NPs"""
+        radii: list[float] = []
+        try:
+            for _, value in stinfo.NanoParticles.NP_DICT.items():
+                pdb_i = pdb_to_df.Pdb(value['source'])
+                radii.append(my_tools.get_radius(pdb_i.atoms))
+        except KeyError:
+            pass
+        return radii
 
     def get_numbers(self,
                     radius: float,  # Radius of the silanized nanoparticle
