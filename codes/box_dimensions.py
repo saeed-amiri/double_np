@@ -80,7 +80,7 @@ class NumMols:
                   ' [degree] which is: '
                   f'"{np.radians(stinfo.Hydration.CONATCT_ANGLE):.4f}" [rad]\n'
                   )
-            self.oil_water_system(radius)
+            self.oil_water_system()
             self.moles_nums['odn'] = self.__get_odn_num()
         # Obviously the number of water should be defined before hand
         self.moles_nums['sal'] = int(self.__get_nacl_num(log))
@@ -93,11 +93,10 @@ class NumMols:
         nacl = SaltSum(self.moles_nums['sol'], log)
         return nacl.n_nacl
 
-    def oil_water_system(self,
-                         radius: float  # Radius of the silanized NP
-                         ) -> None:
+    def oil_water_system(self) -> None:
         """set the data for the system with oil and water"""
         oil_depth: float  # Depth of the oil phase on the NP
+        radius: float = max(self.radii)
         oil_depth = my_tools.oil_depth(radius)
         self.__set_oil_water_edges(oil_depth)
         self.__get_oil_water_numbers(radius, oil_depth)
