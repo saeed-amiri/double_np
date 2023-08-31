@@ -133,6 +133,8 @@ class NanoParticles:
     and where they should set; if 'center' the midpoint between the
     particles will be set at 0 0 0.
     """
+    if len(sys.argv) < 3:
+        sys.exit("\n\t\tCheck the inputs, need two PDB files, Exit!\n")
     NP_LIST: list[dict[str, typing.Any]] = [
         NP1 := {'radius': 25, 'source': sys.argv[1]},
         NP2 := {'radius': 25, 'source': sys.argv[2]},
