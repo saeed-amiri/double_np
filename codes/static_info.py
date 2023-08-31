@@ -8,6 +8,25 @@ SOURCE_DIR: str  # SOURCE OF THE DATA FILES
 SOURCE_DIR = '/scratch/saeed/MyScripts/np_silica/data'
 
 
+class Constants:
+    """The constants which are used in the script"""
+    # The desire coverage for grafting on NP
+    Coverage: float = 10
+    # The thickness of the shell from surface to look for Si atoms
+    Shell_radius: float = 6.0
+    # calculate the level ups for Aminopropyl
+    OM_n: int = 4  # Number of extra atoms (Si, OM) in aminopropyl
+    Amino_OM: int = 3  # The default numbers of OM in the amino file
+    # Silicon name in Aminopropyl file:
+    SI_amino: str = 'SI'
+    # OM name in Aminopropyl file:
+    OM_amino: str = 'OM'
+    # total number of atoms in aminoproyl file
+    Num_amino: int = 17
+    # Length of the ODAP is around 10.9372292106925 but I set to 11
+    ODA_length: float = 11
+
+
 class Hydration:
     """set all the info for water box
     Limitation for the box are added to the maximum radius of the NP"""
