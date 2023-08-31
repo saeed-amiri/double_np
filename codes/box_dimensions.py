@@ -68,7 +68,7 @@ class NumMols:
                     ) -> None:
         """clculate the numbers of each moles if asked"""
         box_volume: float  # Volume of the final system's box
-        box_volume = self.__box_volume(radius)
+        box_volume = self.box_volume()
         # !!!num_oda must be set before num_ioins!!!
         self.moles_nums['oda'] = self.__get_odap_num()
         self.moles_nums['ion'] = self.__get_ion_num(net_charge)
@@ -230,13 +230,12 @@ class NumMols:
             f'set to "{odn_moles}" with total charge of `{odn_moles}`')
         return odn_moles
 
-    def __box_volume(self,
-                     radius: float  # Radius of the silanized nanoparticle
-                     ) -> float:
+    def box_volume(self) -> float:
         """get the box volume with subtracting the volume of NP"""
-        sphere_volume: float  # Volume of the sphere (NP apprx. with sphere)
+        sphere_volume: float = 0  # Volume of the sphere (NP apprx. with sphere
         box_volume: float  # Volume of the final system's box
-        sphere_volume = self.__get_sphere_volume(radius)
+        for radius in self.radii:
+            sphere_volume += self.__get_sphere_volume(radius)
         self.box_edges['box'], box_volume = \
             self.__get_box_volume(sphere_volume)
         return box_volume-sphere_volume
