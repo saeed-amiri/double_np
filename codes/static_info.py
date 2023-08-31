@@ -135,12 +135,11 @@ class NanoParticles:
     """
     if len(sys.argv) < 3:
         sys.exit("\n\t\tCheck the inputs, need two PDB files, Exit!\n")
-    NP_LIST: list[dict[str, typing.Any]] = [
-        NP1 := {'radius': 25, 'source': sys.argv[1]},
-        NP2 := {'radius': 25, 'source': sys.argv[2]},
-        SEPERATION := {'distance': 10, 'origin': 'center'}
-
-    ]
+    NP_DICT: dict[str, dict[str, typing.Any]] = {
+        'NP1' : {'source': sys.argv[1]},
+        'NP2' : {'source': sys.argv[2]},
+        'SEPERATION' : {'distance': 10, 'origin': 'center'}
+    }
 
 
 class PosRes:
