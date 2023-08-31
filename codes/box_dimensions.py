@@ -364,6 +364,7 @@ class BoxEdges:
         num_mols = NumMols(radius, net_charge, log)
         self.box_edges = num_mols.box_edges  # See NumMols class __init__
         self.num_mols = num_mols.moles_nums  # See NumMols class __init__
+        self.radii: list[float, float] = num_mols.radii
         self.get_sections_edge()
 
     def get_sections_edge(self) -> None:
